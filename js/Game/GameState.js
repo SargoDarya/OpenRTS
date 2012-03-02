@@ -18,12 +18,17 @@ GameState.prototype.render = function()
     
 };
 
-GameState.prototype.keyHandler = function()
+GameState.prototype.keyHandler = function(evt)
 {
     
 };
 
-GameState.prototype.mouseHandler = function()
+GameState.prototype.mouseHandler = function(evt)
 {
     
+};
+
+GameState.prototype.resizeHandler = function(evt)
+{
+  
 };

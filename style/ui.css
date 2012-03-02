@@ -1,0 +1,33 @@
+#bottomBar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 200px;
+  z-index: 5;
+}
+
+#iconHolder {
+  width: 213px;
+  height: 159px;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  background: url('/ui/icon_holder.png') no-repeat;
+}
+
+#fullScreenButton {
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: white;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+#gui {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}

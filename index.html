@@ -5,23 +5,31 @@
   <script type="text/javascript" src="js/Three.js"></script>
   <script type="text/javascript" src="js/THREEx/THREEx.FullScreen.js"></script>
   <script type="text/javascript" src="js/THREEx/THREEx.KeyboardState.js"></script>
+  <script type="text/javascript" src="js/THREEx/THREEx.WindowResize.js"></script>
   <script type="text/javascript" src="js/THREEx/THREEx.requestAnimationFrame.js"></script>
   <script type="text/javascript" src="js/Game/Game.js"></script>
+  <script type="text/javascript" src="js/Game/Mouse.js"></script>
   <script type="text/javascript" src="js/Game/StateManager.js"></script>
   <script type="text/javascript" src="js/Game/GameState.js"></script>
   <script type="text/javascript" src="js/Game/PlayState.js"></script>
 	<script type="text/javascript" src="js/main.js"></script>
   
   <link rel="stylesheet" type="text/css" href="style/main.css" />
+  <link rel="stylesheet" type="text/css" href="style/ui.css" />
 </head>
 
 <body>
+  
 	<div id="gameContainer">
+    <div id="bottomBar">
+      <a id="fullScreenButton">Toggle Fullscreen</a>
+      <div id="iconHolder"></div>
+    </div>
 	</div>
 
   <script type="text/javascript">
     var game = new Game();
-    game.run(new PlayState());
+    game.init().run(new PlayState());
   </script>
 </body>
 
