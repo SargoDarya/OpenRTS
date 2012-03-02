@@ -3,16 +3,25 @@
 <head>
   <title>OpenRTS</title>
   <script type="text/javascript" src="js/Three.js"></script>
-  <script type="text/javascript" src="js/THREEx.FullScreen.js"></script>
-  <script type="text/javascript" src="js/THREEx.KeyboardState.js"></script>
-  <script type="text/javascript" src="js/THREEx.requestAnimationFrame.js"></script>
-  <script type="text/javascript" src="js/knockout-2.0.0.js"></script>
+  <script type="text/javascript" src="js/THREEx/THREEx.FullScreen.js"></script>
+  <script type="text/javascript" src="js/THREEx/THREEx.KeyboardState.js"></script>
+  <script type="text/javascript" src="js/THREEx/THREEx.requestAnimationFrame.js"></script>
   <script type="text/javascript" src="js/Game/Game.js"></script>
+  <script type="text/javascript" src="js/Game/StateManager.js"></script>
+  <script type="text/javascript" src="js/Game/GameState.js"></script>
+  <script type="text/javascript" src="js/Game/PlayState.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
+  
+  <link rel="stylesheet" type="text/css" href="style/main.css" />
 </head>
 
 <body>
+	<div id="gameContainer">
+	</div>
+
   <script type="text/javascript">
-    new Game();
+    var game = new Game();
+    game.run(new PlayState());
   </script>
 </body>
 
