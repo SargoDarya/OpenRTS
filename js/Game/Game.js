@@ -12,6 +12,7 @@ var Game = function()
   this.sizeW = 0;
   this.sizeH = 0;
   
+  this.network = null;
   this.gui = null;
   this.mouse = null;
   
@@ -27,7 +28,12 @@ Game.prototype.init = function()
   this.sizeW = window.innerWidth;
   this.sizeH = window.innerHeight;
   
+  this.gui = new GUI.Manager();
+  
   this.mouse = new Mouse;
+  
+  // Set up Networking
+  this.network = new Network();
   
   // Set up game wide objects
   this.stateManager = new StateManager();
@@ -36,6 +42,7 @@ Game.prototype.init = function()
   this.renderer.setSize(window.innerWidth, window.innerHeight);
 
   this.gameContainer.appendChild(this.renderer.domElement);
+  this.gameContainer.appendChild(this.gui.domElement);
   
   // Bind Events
   document.onmousemove = function(evt) {
@@ -47,29 +54,34 @@ Game.prototype.init = function()
   };
   window.addEventListener('resize', resizeListener, false);
   
-  // Bind Fullscreen button
-  var fsBtn = document.getElementById('fullScreenButton');
-  if(fsBtn) {
-    fsBtn.onclick = function() {
-      game.toggleFullScreen();
-    }
-  }
+  this.prepareFullScreen();
   
   return this;
 };
 
-Game.prototype.toggleFullScreen = function()
+Game.prototype.prepareFullScreen = function()
+{
+  var self = this;
+  document.onkeydown = function(evt) {
+    if(evt.ctrlKey && evt.keyCode == 70) {
+      self.toggleFullScreen();
+    }
+  };
+};
+
+Game.prototype.toggleFullScreen = function(evt)
 {
   if(THREEx.FullScreen.activated()) {
     THREEx.FullScreen.cancel();
   } else {
-    THREEx.FullScreen.request(this.gameContainer);
+    THREEx.FullScreen.request(game.gameContainer);
   }
 };
 
 Game.prototype.mouseHandler = function(evt)
 {
   game.mouse.injectEvent(evt);
+  this.gui.injectMouseMove(evt);
   this.stateManager.getActiveState().mouseHandler(evt);
 };
 
@@ -99,6 +111,7 @@ Game.prototype.animate = function()
     var state = self.stateManager.getActiveState();
     state.update();
     state.render();
+    self.gui.render();
     requestAnimationFrame(animationLoop);
   }
 

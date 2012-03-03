@@ -44,10 +44,12 @@ function wrapInTags($array) {
   return $buffer;
 }
 
+$guiClasses = getFilesFromDir("js/GUI");
 $gameClasses = getFilesFromDir("js/Game");
 $threeXClasses = getFilesFromDir("js/THREE");
+$utilsClasses = getFilesFromDir("js/Utils");
 
-$scriptArray = array_merge($gameClasses, $threeXClasses);
+$scriptArray = array_merge($gameClasses, $guiClasses, $threeXClasses, $utilsClasses);
 $scripts = wrapInTags($scriptArray);
 
 $tmpl = file_get_contents("index.html");

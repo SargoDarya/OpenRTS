@@ -5,6 +5,7 @@
   bottom: 0;
   height: 200px;
   z-index: 5;
+  display: none;
 }
 
 #iconHolder {
@@ -29,5 +30,5 @@
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 2;
+  z-index: 5;
 }

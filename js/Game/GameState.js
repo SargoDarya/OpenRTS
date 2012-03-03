@@ -28,6 +28,11 @@ GameState.prototype.mouseHandler = function(evt)
     
 };
 
+GameState.prototype.clickHandler = function(evt)
+{
+    
+};
+
 GameState.prototype.resizeHandler = function(evt)
 {
   

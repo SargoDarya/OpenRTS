@@ -1,31 +1,42 @@
-var Sprite = function(imagePath) {
+/** @namespace **/
+var GUI = GUI || {};
+GUI.Sprite = function() {};
+
+GUI.Sprite.prototype = new GUI.DisplayObject;
+GUI.Sprite.prototype.constructor = GUI.Sprite;
+
+/**
+ * Load a sprite from a remote path
+ * @param {String}, path
+ * @return void
+ */
+GUI.Sprite.prototype.fromPath = function(path)
+{
   var self = this;
   
-  this.parent = null;
-  this.position = {x: 0, y: 0};
-  this.previousPosition = {x: 0, y: 0};
-  this._loaded = false;
+  this.isVisible(false);
   
   this.image = new Image();
   this.image.onload = function(evt) {
-    self.loadHandler(evt);
+    self.remoteLoadHandler(evt);
   }
-  this.image.src = imagePath;
+  this.image.src = path;
 };
 
-Sprite.prototype.loadHandler = function(evt) {
-  this._loaded = true;
-  this._width = this.image.width;
-  this._height = this.image.height;
+GUI.Sprite.prototype.remoteLoadHandler = function(evt) 
+{
+  this.isVisible(true);
+  this.isDirty(true);
+  this.size(this.image.width, this.image.height);
+};
+
+GUI.Sprite.prototype.render = function() 
+{
+  var pos = GUI.Display.getTLPosition(this._position, this._size, this._anchorPoint);
   
-  if(this.parent) this.parent._dirty = true;
+  game.gui.drawImage(this.image, pos.x, pos.y);
+  
+  this._dirty = false;
+  
+  GUI.DisplayObject.prototype.render.call(this);
 };
-
-Sprite.prototype.setPosition = function(x, y) {
-  this.previousPosition = this.position;
-  this.position = {x: x, y: y};
-};
-
-Sprite.prototype.isLoaded = function() {
-  return this._loaded;
-}
