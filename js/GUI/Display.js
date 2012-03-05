@@ -3,6 +3,9 @@ GUI.Display = {};
 
 GUI.Display.dirtyRectangles = [];
 
+// Instanciate GUI Manager
+GUI.Display.Manager = new GUI.Manager();
+
 GUI.Display.getNormalizedPosition = function(x, y) 
 {
   var w = window.innerWidth;
@@ -19,12 +22,26 @@ GUI.Display.getDenormalizedPosition = function(x, y)
   return {x: w*x, y: h*y*-1+h};
 };
 
-GUI.Display.getTLPosition = function(position, size, anchorPoint)
+/**
+ * Returns the top left 
+ */
+GUI.Display.getTLPosition = function(obj)
 {
-  position = GUI.Display.getDenormalizedPosition(position.x, position.y);
+  var parentOffset = {x: 0, y: 0};
   
-  var x = position.x-(size.width*anchorPoint.x);
-  var y = position.y-(size.height*-(anchorPoint.y-1));
-  
+  if(obj._parent) {
+    var parentOffset = GUI.Display.getTLPosition(obj._parent);
+  }
+
+  var position = GUI.Display.getDenormalizedPosition(obj._position.x, obj._position.y);
+
+  var x = position.x-(obj._size.width*obj._anchorPoint.x);
+  var y = position.y-(obj._size.height*-(obj._anchorPoint.y-1));
+
   return {x: x, y: y};
+};
+
+GUI.Display.getObjectAtPoint = function(point)
+{
+  console.log()
 };

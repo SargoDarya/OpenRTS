@@ -20,9 +20,6 @@ PlayState.prototype.init = function()
   this.scene = new THREE.Scene();
   this.scene.add(this.camera);
   
-  // Connect to server
-  game.network.connect(Config.Server);
-  
   // Create Basic Plane
   var texture = THREE.ImageUtils.loadTexture("textures/grass2.jpg");
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -52,10 +49,26 @@ PlayState.prototype.setupGUI = function()
 {
   var toolbox = new GUI.Sprite();
   toolbox.fromPath('ui/icon_holder.png');
-  toolbox.position(1, 0);
+  toolbox.position(0.98, 0.02);
   toolbox.anchorPoint(1, 0);
   
+  var debugConsole = new DebugConsole();
+  game.gui.addChild(debugConsole.textArea);
+  game.gui.addChild(debugConsole.textInput);
   game.gui.addChild(toolbox);
+  
+  // attach to Debug Console
+  debugConsole.textInput._enterCallback = this.sendMessage;
+};
+
+PlayState.prototype.sendMessage = function(data)
+{
+  game.network.send('UserMessage', {msg: data});
+};
+
+PlayState.prototype.networkHandler = function(evt)
+{
+  console.log(evt.msg);
 };
 
 PlayState.prototype.mouseHandler = function(evt)
@@ -68,19 +81,16 @@ PlayState.prototype.resizeHandler = function(evt)
 {
   this.camera.aspect = game.sizeW/game.sizeH;
   this.camera.updateProjectionMatrix();
-  
-  game.gui.resizeHandler();
 };
 
 PlayState.prototype.update = function()
 {
-  game.mouse.getNormalizedPosition();
   var mousePos = game.mouse.getNormalizedPosition();
-  if(mousePos.x < 0.05) this.camera.position.x -= (mousePos.x-0.05)*-100;
-  if(mousePos.y < 0.10) this.camera.position.z += (mousePos.y-0.10)*-100/2;
+  if(mousePos.x < 0.01) this.camera.position.x -= (mousePos.x-0.01)*-100*2;
+  if(mousePos.y < 0.05) this.camera.position.z += (mousePos.y-0.05)*-100/2;
   
-  if(mousePos.x > 0.95) this.camera.position.x -= (mousePos.x-0.95)*-100;
-  if(mousePos.y > 0.90) this.camera.position.z += ((mousePos.y-0.90)*-100)/2;
+  if(mousePos.x > 0.99) this.camera.position.x -= (mousePos.x-0.99)*-100*2;
+  if(mousePos.y > 0.95) this.camera.position.z += ((mousePos.y-0.95)*-100)/2;
 };
 
 PlayState.prototype.render = function()

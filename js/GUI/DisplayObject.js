@@ -1,18 +1,37 @@
 /** @namespace */
 var GUI = GUI || {};
-GUI.DisplayObject = function(){};
+GUI.DisplayObject = function(){
+  /** Properties */
+  this._dirty    = false;
+  this._hasDirty = false;
+  this._parent   = null;
+  this._children = [];
 
-/** Properties */
-GUI.DisplayObject.prototype._dirty    = false;
-GUI.DisplayObject.prototype._hasDirty = false;
-GUI.DisplayObject.prototype._parent   = null;
-GUI.DisplayObject.prototype._children = [];
-
-/** Positioning */
-GUI.DisplayObject.prototype._oldPosition = {};
-GUI.DisplayObject.prototype._position    = {};
-GUI.DisplayObject.prototype._position.x  = 0;
-GUI.DisplayObject.prototype._position.y  = 0;
+  /** Positioning */
+  this._position    = {};
+  this._position.x  = 0;
+  this._position.y  = 0;
+  
+  /** Z-Ordering */
+  this._z           = 1;
+  
+  /** Anchor Point */
+  this._anchorPoint    = {};
+  this._anchorPoint.x  = 0;
+  this._anchorPoint.y  = 0;
+  
+  /** Visibility */
+  this._visible = true;
+  
+  /** Width/Height */
+  this._size        = {};
+  this._size.width  = 0;
+  this._size.height = 0;
+  
+  /** Instancing */
+  this._tag = "";
+  this._ctx = null;
+};
 
 /**
  * Set the position of a DisplayObject
@@ -22,13 +41,28 @@ GUI.DisplayObject.prototype._position.y  = 0;
  */
 GUI.DisplayObject.prototype.position = function(x, y) 
 {
+  this.invalidateRect();
   this._position.x = x;
   this._position.y = y;
+  this.invalidateRect()
 };
 
-
-/** Z-Ordering */
-GUI.DisplayObject.prototype._z           = 1;
+/**
+ * Convenience Method to get a rect
+ * @return GUI.Rect
+ */
+GUI.DisplayObject.prototype.rect = function()
+{
+  return new GUI.Rect(
+    {
+      width: this._size.width,
+      height: this._size.height
+    }, 
+    {
+      x: this._position.x,
+      y: this._position.y
+    });
+};
 
 /**
  * Sets the z layer the object is rendered at
@@ -41,20 +75,11 @@ GUI.DisplayObject.prototype.z = function(z) {
 };
 
 
-/** Anchor Point */
-GUI.DisplayObject.prototype._anchorPoint    = {};
-GUI.DisplayObject.prototype._anchorPoint.x  = 0;
-GUI.DisplayObject.prototype._anchorPoint.y  = 0;
-
 GUI.DisplayObject.prototype.anchorPoint = function(x, y)
 {
   this._anchorPoint = {x: x, y: y};
-  
   return this._anchorPoint;
 }
-
-
-GUI.DisplayObject.prototype._visible = true;
 
 /**
  * Set the visibility of an object
@@ -63,16 +88,9 @@ GUI.DisplayObject.prototype._visible = true;
  */
 GUI.DisplayObject.prototype.isVisible = function(visibility) 
 {
-  if(typeof visibility === "boolean") this._visible = visibility;
-  
+  if(typeof visibility === "boolean") this._visible = visibility; 
   return this._visible;
 };
-
-
-/** Width/Height */
-GUI.DisplayObject.prototype._size        = {};
-GUI.DisplayObject.prototype._size.width  = 0;
-GUI.DisplayObject.prototype._size.height = 0;
 
 /**
  * Set and get size
@@ -88,8 +106,6 @@ GUI.DisplayObject.prototype.size = function(width, height)
     height: this._size.height
   };
 };
-
-GUI.DisplayObject.prototype._tag = "";
 
 /** 
  * Set a DisplayObject Tag 
@@ -122,8 +138,52 @@ GUI.DisplayObject.prototype.isDirty = function()
  */
 GUI.DisplayObject.prototype.setDirtyChilds = function()
 {
-  this._hasDirty = true;
+  this._dirty = true;
   if(this._parent != null) this._parent.setDirtyChilds();
+};
+
+GUI.DisplayObject.prototype.redraw = function()
+{
+  this._dirty = true;
+  for(var i=0; i<this._children.length; i++) {
+    this._children[i].redraw();
+  }
+};
+
+GUI.DisplayObject.prototype.redrawRect = function(rect)
+{
+  this._dirty = true;
+  if(this._parent) this.invalidateRect();
+  for(var i=0; i<this._children.length; i++) {
+    //var pos = rect.position(); 
+    //pos = GUI.Display.getDenormalizedPosition(pos.x, pos.y);
+    //rect.position(Math.round(pos.x), Math.round(pos.y));
+    
+    var cr = this._children[i].rect();
+    var cp = GUI.Display.getTLPosition(this._children[i]);
+    cr.position(Math.round(cp.x), Math.round(cp.y));
+
+    //console.log(rect.toString() + ' && ' + cr.toString());
+
+    if(rect.containsRect(cr)) {
+      this._children[i].redrawRect(rect);
+    }
+  }
+};
+
+GUI.DisplayObject.prototype.getChildAtPoint = function(point)
+{
+  var child = this;
+  for(var i=0; i<this._children.length; i++) {
+    var r = this._children[i].rect();
+    var pos = GUI.Display.getTLPosition(this._children[i]);
+    r.position(pos.x, pos.y);
+    if(r.containsPoint(point)) {
+      child = this._children[i].getChildAtPoint(point);
+      break;
+    }
+  }
+  return child;
 };
 
 /**
@@ -136,9 +196,9 @@ GUI.DisplayObject.prototype.addChild = function(child)
   assert(child._parent === null, "DisplayObject already has a parent");
   assert(child._parent != this, "DisplayObject was already added to parent");
   
-  child.isDirty(true);
+  child._parent = this;
+  child._ctx = this._ctx;
   this._children.push(child);
-  this._hasDirty = true;
   
   return true;
 };
@@ -161,6 +221,7 @@ GUI.DisplayObject.prototype.removeChild = function(child)
 GUI.DisplayObject.prototype.removeAllChilds = function() 
 {
   for(var i=0; i<this._children.length; i++) {
+    this._children[i].removeAllChilds();
     this._children[i].removeFromParent();
   }
 };
@@ -171,7 +232,7 @@ GUI.DisplayObject.prototype.removeAllChilds = function()
  */
 GUI.DisplayObject.prototype.removeFromParent = function() 
 {
-  assert(this._parent == null, "DisplayObject has no parent");
+  assert(this._parent != null, "DisplayObject has no parent");
   this._parent.removeChild(this);
 };
 
@@ -182,9 +243,7 @@ GUI.DisplayObject.prototype.removeFromParent = function()
 GUI.DisplayObject.prototype.render = function()
 {
   for(var i=0; i<this._children.length; i++) {
-    if( this._children[i].isVisible() && 
-         (this._children[i]._dirty || 
-          this._children[i]._hasDirty)) {
+    if( this._children[i].isVisible()) {
       this._children[i].render();
     }
   }
@@ -197,6 +256,25 @@ GUI.DisplayObject.prototype.render = function()
  * @return void
  */
 GUI.DisplayObject.prototype.invalidateRect = function()
-{
-  GUI.Display.dirtyRectangles.push(this._size, this._position);
+{ 
+  if(this.parent === null) {
+    return null;
+  }
+
+  var pos = GUI.Display.getTLPosition(this);
+  var pos2 = GUI.Display.getNormalizedPosition(pos.x, pos.y);
+  
+  var r = new GUI.Rect(
+    {
+      width: this._size.width, 
+      height: this._size.height
+    },
+    {
+      x: pos2.x, 
+      y: pos2.y
+    }
+  );
+
+  GUI.Display.dirtyRectangles.push(r);
+  return r;
 };

@@ -21,7 +21,13 @@ StateManager.prototype.pushState = function(state)
 
 StateManager.prototype.popState = function()
 {
-  return this.states.pop();
+  return this.states.pop().cleanUp();
+};
+
+StateManager.prototype.replaceState = function(state)
+{
+  this.popState();
+  this.pushState(state);
 };
 
 StateManager.prototype.getActiveState = function()

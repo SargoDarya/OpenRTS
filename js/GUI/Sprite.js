@@ -1,6 +1,8 @@
 /** @namespace **/
 var GUI = GUI || {};
-GUI.Sprite = function() {};
+GUI.Sprite = function() {
+  GUI.DisplayObject.call(this);
+};
 
 GUI.Sprite.prototype = new GUI.DisplayObject;
 GUI.Sprite.prototype.constructor = GUI.Sprite;
@@ -32,10 +34,10 @@ GUI.Sprite.prototype.remoteLoadHandler = function(evt)
 
 GUI.Sprite.prototype.render = function() 
 {
-  var pos = GUI.Display.getTLPosition(this._position, this._size, this._anchorPoint);
+  //var pos = GUI.Display.getTLPosition(this);
   
-  game.gui.drawImage(this.image, pos.x, pos.y);
-  
+  game.gui.drawImage(this);
+
   this._dirty = false;
   
   GUI.DisplayObject.prototype.render.call(this);

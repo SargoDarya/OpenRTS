@@ -4,24 +4,36 @@
   <title>OpenRTS</title>
   <script type="text/javascript" src="js/Config.js"></script>
   <script type="text/javascript" src="js/Three.js"></script>
-  <!--scripts-->
   
+  <!--gui-->
+  <script type="text/javascript" src="js/GUI/Manager.js"></script>
+  <script type="text/javascript" src="js/GUI/Point.js"></script>
+  <script type="text/javascript" src="js/GUI/Rect.js"></script>
+  <script type="text/javascript" src="js/GUI/Mouse.js"></script>
+  
+  <script type="text/javascript" src="js/GUI/DisplayObject.js"></script>
+  <script type="text/javascript" src="js/GUI/Sprite.js"></script>
+  <script type="text/javascript" src="js/GUI/TextLabel.js"></script>
+  <script type="text/javascript" src="js/GUI/TextArea.js"></script>
+  <script type="text/javascript" src="js/GUI/TextInput.js"></script>
+  <script type="text/javascript" src="js/GUI/Window.js"></script>
+  <script type="text/javascript" src="js/GUI/Button.js"></script>
+  
+  <script type="text/javascript" src="js/GUI/Display.js"></script>
+  
+  <!--scripts-->
+
   <link rel="stylesheet" type="text/css" href="style/main.css" />
   <link rel="stylesheet" type="text/css" href="style/ui.css" />
 </head>
 
 <body>
   
-	<div id="gameContainer">
-    <div id="bottomBar">
-      <a id="fullScreenButton">Toggle Fullscreen</a>
-      <div id="iconHolder"></div>
-    </div>
-	</div>
+	<div id="gameContainer"></div>
 
   <script type="text/javascript">
     var game = new Game();
-    game.init().run(new PlayState());
+    game.init().run(new MenuState());
   </script>
 </body>
 

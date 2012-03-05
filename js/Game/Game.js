@@ -27,10 +27,10 @@ Game.prototype.init = function()
   
   this.sizeW = window.innerWidth;
   this.sizeH = window.innerHeight;
+
+  this.gui = GUI.Display.Manager;
   
-  this.gui = new GUI.Manager();
-  
-  this.mouse = new Mouse;
+  this.mouse = this.gui._mouse;
   
   // Set up Networking
   this.network = new Network();
@@ -46,7 +46,11 @@ Game.prototype.init = function()
   
   // Bind Events
   document.onmousemove = function(evt) {
-    self.mouseHandler(evt);
+    self.mouseMoveHandler(evt);
+  };
+  
+  document.onclick = function(evt) {
+    self.mouseClickHandler(evt);
   };
   
   function resizeListener(evt) {
@@ -56,6 +60,9 @@ Game.prototype.init = function()
   
   this.prepareFullScreen();
   
+  // Connect to server
+  this.network.connect(Config.Server);
+  
   return this;
 };
 
@@ -63,26 +70,70 @@ Game.prototype.prepareFullScreen = function()
 {
   var self = this;
   document.onkeydown = function(evt) {
+    evt.stopImmediatePropagation();
     if(evt.ctrlKey && evt.keyCode == 70) {
-      self.toggleFullScreen();
+      self.toggleFullScreen(evt);
+      self.requestPointerLock(evt);
+      return null;
     }
+    self.keyDownHandler(evt);
+    return false;
   };
+  
+  document.addEventListener("fullscreenchange", function(evt) {
+    if(!document.fullscreenEnabled) {
+      self.mouse.setAbsolute();
+      self.mouse._cursor.removeFromParent();
+    }
+  });
 };
 
 Game.prototype.toggleFullScreen = function(evt)
 {
-  if(THREEx.FullScreen.activated()) {
-    THREEx.FullScreen.cancel();
-  } else {
-    THREEx.FullScreen.request(game.gameContainer);
-  }
+  //if(THREEx.FullScreen.activated()) {
+    /*THREEx.FullScreen.cancel();
+    this.mouse.setAbsolute();
+    this.mouse._cursor.removeFromParent();*/
+  //} else {
+    game.gameContainer.requestFullScreen();
+  //}
 };
 
-Game.prototype.mouseHandler = function(evt)
+Game.prototype.preparePointerLock = function() {
+  var self = this;
+  
+  document.addEventListener('webkitpointerlocklost', function(e) {  
+    self.mouse._cursor.removeFromParent();
+    self.mouse.setAbsolute();
+  }, false);
+}
+
+Game.prototype.requestPointerLock = function(evt)
 {
-  game.mouse.injectEvent(evt);
+  this.gameContainer.requestPointerLock();
+  this.gui.addChild(this.mouse._cursor);
+  this.mouse._cursor.position(0.5, 0.5);
+  this.mouse._cursor.tag('cursor');
+  this.mouse.setRelative();
+};
+
+/** Event Handler **/
+
+Game.prototype.mouseMoveHandler = function(evt)
+{
   this.gui.injectMouseMove(evt);
-  this.stateManager.getActiveState().mouseHandler(evt);
+  this.stateManager.getActiveState().mouseMoveHandler(evt);
+};
+
+Game.prototype.mouseClickHandler = function(evt)
+{
+  this.gui.injectMouseClick(evt);
+  this.stateManager.getActiveState().mouseClickHandler(evt);
+};
+
+Game.prototype.keyDownHandler = function(evt)
+{
+  this.gui.injectKeyDown(evt);
 };
 
 Game.prototype.resizeHandler = function(evt)
@@ -90,6 +141,8 @@ Game.prototype.resizeHandler = function(evt)
   this.sizeW = window.innerWidth;
   this.sizeH = window.innerHeight;
   this.renderer.setSize(this.sizeW, this.sizeH);
+  
+  this.gui.setSize(this.sizeW, this.sizeH);
   
   this.stateManager.getActiveState().resizeHandler(evt);
 }

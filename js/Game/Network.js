@@ -17,7 +17,7 @@ Network.prototype.connect = function(domain)
 
 Network.prototype.openHandler = function(evt)
 {
-  console.log('opened');
+  //console.log('Connected to Server');
 };
 
 Network.prototype.closeHandler = function(evt)
@@ -27,10 +27,10 @@ Network.prototype.closeHandler = function(evt)
 
 Network.prototype.messageHandler = function(evt)
 {
-  console.log(evt);
+  game.stateManager.getActiveState().networkHandler(evt);
 };
 
 Network.prototype.send = function(type, obj) 
 {
-  this._socket.send(type, obj);
+  this._socket.emit(type, obj);
 };
