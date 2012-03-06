@@ -44,7 +44,6 @@ function wrapInTags($array) {
   return $buffer;
 }
 
-$guiClasses = getFilesFromDir("js/GUI");
 $gameClasses = getFilesFromDir("js/Game");
 $threeXClasses = getFilesFromDir("js/THREE");
 $utilsClasses = getFilesFromDir("js/Utils");

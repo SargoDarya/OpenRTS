@@ -12,7 +12,7 @@ MenuState.prototype.init = function()
   wnd.size(400, 300);
   wnd.position(0.5, 0.5);
   wnd.anchorPoint(0.5, 0.5);
-  wnd.background("#AAAAAA");
+  wnd.backgroundColor("#AAAAAA");
   
   var userLabel = new GUI.TextLabel();
   userLabel.text('Please state your name');
